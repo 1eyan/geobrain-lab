@@ -19,14 +19,19 @@ npm run dev
 
 ### Updating the starter handbook
 
-The public handbook uses the stable path `public/guides/geophysics-ai-onboarding.pdf`. To publish a revision without changing any page links:
+The handbook is published only as the encrypted asset `public/guides/geophysics-ai-onboarding.enc`. Keep the source PDF outside the repository and generate a replacement locally:
 
-1. Open `public/guides/` in the GitHub repository.
-2. Upload the revised PDF with the exact filename `geophysics-ai-onboarding.pdf`, replacing the existing file.
-3. Commit directly to `main` or merge a reviewed pull request.
-4. The GitHub Pages workflow validates and republishes the site automatically.
+```powershell
+$env:GEOBRAIN_GUIDE_PASSWORD='your-password'
+npm run encrypt:guide -- 'C:\path\to\updated-handbook.pdf'
+Remove-Item Env:GEOBRAIN_GUIDE_PASSWORD
+```
+
+Commit the updated `.enc` file to `main`; GitHub Pages will validate and republish it automatically. Never place the unencrypted PDF under `public/` or commit it to the repository. The password is not stored in the site source: the browser derives a key from the entered password and decrypts the guide locally.
 
 Replace `public/guides/geophysics-ai-onboarding-cover.png` as well whenever the cover design changes.
+
+Security note: this provides encrypted static access, but a weak password can still be guessed offline. Earlier repository commits that contained an unencrypted PDF must be removed from Git history before the document should be considered confidential.
 
 ### Updating member photos
 

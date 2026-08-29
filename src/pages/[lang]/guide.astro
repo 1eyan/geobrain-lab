@@ -10,7 +10,7 @@ export function getStaticPaths() {
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = ui[lang];
-const pdfUrl = `${import.meta.env.BASE_URL}${siteMeta.guideFile}`;
+const encryptedUrl = `${import.meta.env.BASE_URL}${siteMeta.guideEncryptedFile}`;
 ---
 
 <BaseLayout
@@ -27,27 +27,122 @@ const pdfUrl = `${import.meta.env.BASE_URL}${siteMeta.guideFile}`;
         <h1 class="page-title">{lang === 'zh' ? '从这里，建立地球物理与人工智能的共同语言。' : 'Start here: build a shared language for geophysics and AI.'}</h1>
         <p class="lede">{lang === 'zh' ? '本手册由 GeoBrain、MGGA 编写，面向新入组研究生与本科生，覆盖研究任务、人工智能基础、科研工具、论文阅读与实践资源。' : 'Prepared by GeoBrain and MGGA for new graduate and undergraduate members, this handbook covers research tasks, AI foundations, scientific tools, paper reading and practical resources.'}</p>
         <div class="hero-actions">
-          <a class="button button-primary" href={pdfUrl} target="_blank" rel="noopener noreferrer">{lang === 'zh' ? '在新窗口阅读 PDF' : 'Open PDF in a new tab'}<span>↗</span></a>
-          <a class="button button-ghost" href={pdfUrl} download>{lang === 'zh' ? '下载最新版' : 'Download latest'}<span>↓</span></a>
+          <a class="button button-primary" href="#guide-access">{lang === 'zh' ? '输入密码阅读' : 'Enter password to read'}<span>↓</span></a>
         </div>
-        <p class="guide-update-note">{lang === 'zh' ? '稳定更新地址 · 上传同名文件后由 GitHub Actions 自动发布' : 'Stable update path · replacing the file triggers automatic deployment through GitHub Actions'}</p>
+        <p class="guide-update-note">{lang === 'zh' ? '受密码保护 · 解密仅在当前浏览器中进行' : 'Password protected · decryption happens only in your browser'}</p>
       </div>
       <img src={`${import.meta.env.BASE_URL}${siteMeta.guideCover}`} alt={lang === 'zh' ? '新人培训手册封面' : 'Starter handbook cover'} width="372" height="526" />
     </div>
   </section>
 
-  <section class="section-tight guide-reader-section">
+  <section class="section-tight guide-access-section" id="guide-access">
+    <div class="shell">
+      <div class="guide-access-panel" data-guide-shell data-encrypted-url={encryptedUrl} data-iterations="310000" data-lang={lang}>
+        <div>
+          <p class="eyebrow">Protected access</p>
+          <h2>{lang === 'zh' ? '输入访问密码' : 'Enter access password'}</h2>
+          <p>{lang === 'zh' ? '验证成功后可在线阅读或下载本手册。刷新页面后需要重新验证。' : 'After verification, the handbook can be read online or downloaded. A page refresh requires verification again.'}</p>
+        </div>
+        <form class="guide-access-form" data-guide-access>
+          <label for={`guide-password-${lang}`}>{lang === 'zh' ? '访问密码' : 'Access password'}</label>
+          <div>
+            <input id={`guide-password-${lang}`} name="password" type="password" inputmode="numeric" autocomplete="current-password" required />
+            <button class="button button-primary" type="submit">{lang === 'zh' ? '解锁指南' : 'Unlock guide'}</button>
+          </div>
+          <p class="guide-access-status" data-guide-status aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight guide-reader-section" data-guide-content hidden>
     <div class="shell">
       <div class="guide-reader-head">
         <div><p class="eyebrow">Read online</p><h2>{lang === 'zh' ? '在线阅读' : 'Read online'}</h2></div>
         <span>{siteMeta.guidePages} {lang === 'zh' ? '页' : 'pages'} · PDF</span>
       </div>
-      <object class="guide-reader" data={`${pdfUrl}#view=FitH`} type="application/pdf" aria-label={lang === 'zh' ? '地球物理与人工智能新人培训手册 PDF' : 'Geophysics and AI Starter Handbook PDF'}>
+      <div class="guide-reader-actions">
+        <a class="button button-primary" data-guide-open target="_blank" rel="noopener noreferrer">{lang === 'zh' ? '在新窗口阅读' : 'Open in a new tab'}<span>↗</span></a>
+        <a class="button button-ghost" data-guide-download download="geophysics-ai-onboarding.pdf">{lang === 'zh' ? '下载 PDF' : 'Download PDF'}<span>↓</span></a>
+      </div>
+      <object class="guide-reader" data-guide-reader type="application/pdf" aria-label={lang === 'zh' ? '地球物理与人工智能新人培训手册 PDF' : 'Geophysics and AI Starter Handbook PDF'}>
         <div class="guide-reader-fallback">
-          <p>{lang === 'zh' ? '当前浏览器不支持内嵌 PDF 阅读。' : 'This browser does not support embedded PDF viewing.'}</p>
-          <a class="button button-primary" href={pdfUrl} target="_blank" rel="noopener noreferrer">{lang === 'zh' ? '打开 PDF' : 'Open PDF'}<span>↗</span></a>
+          <p>{lang === 'zh' ? '当前浏览器不支持内嵌 PDF 阅读，请使用上方按钮打开。' : 'This browser cannot embed the PDF; use the button above to open it.'}</p>
         </div>
       </object>
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  const shell = document.querySelector<HTMLElement>('[data-guide-shell]');
+  const form = shell?.querySelector<HTMLFormElement>('[data-guide-access]');
+  const passwordInput = form?.querySelector<HTMLInputElement>('input[name="password"]');
+  const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const status = form?.querySelector<HTMLElement>('[data-guide-status]');
+  const content = document.querySelector<HTMLElement>('[data-guide-content]');
+  const reader = content?.querySelector<HTMLObjectElement>('[data-guide-reader]');
+  const openLink = content?.querySelector<HTMLAnchorElement>('[data-guide-open]');
+  const downloadLink = content?.querySelector<HTMLAnchorElement>('[data-guide-download]');
+  let guideBlobUrl = '';
+
+  const setStatus = (message: string, state: 'idle' | 'error' | 'success' = 'idle') => {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.state = state;
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!shell || !passwordInput || !submitButton || !content || !reader || !openLink || !downloadLink) return;
+
+    const isZh = shell.dataset.lang === 'zh';
+    submitButton.disabled = true;
+    setStatus(isZh ? '正在验证并解密…' : 'Verifying and decrypting…');
+
+    try {
+      const response = await fetch(shell.dataset.encryptedUrl ?? '', { cache: 'no-store' });
+      if (!response.ok) throw new Error('encrypted guide unavailable');
+
+      const payload = new Uint8Array(await response.arrayBuffer());
+      const magic = new TextDecoder().decode(payload.slice(0, 4));
+      if (magic !== 'GBG1' || payload.length < 49) throw new Error('invalid encrypted guide');
+
+      const salt = payload.slice(4, 20);
+      const iv = payload.slice(20, 32);
+      const encrypted = payload.slice(32);
+      const passwordBytes = new TextEncoder().encode(passwordInput.value);
+      const keyMaterial = await crypto.subtle.importKey('raw', passwordBytes, 'PBKDF2', false, ['deriveKey']);
+      const key = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: Number(shell.dataset.iterations), hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['decrypt'],
+      );
+      const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv, tagLength: 128 }, key, encrypted);
+      const signature = new TextDecoder().decode(new Uint8Array(plaintext).slice(0, 5));
+      if (signature !== '%PDF-') throw new Error('decrypted file is not PDF');
+
+      if (guideBlobUrl) URL.revokeObjectURL(guideBlobUrl);
+      guideBlobUrl = URL.createObjectURL(new Blob([plaintext], { type: 'application/pdf' }));
+      reader.data = `${guideBlobUrl}#view=FitH`;
+      openLink.href = guideBlobUrl;
+      downloadLink.href = guideBlobUrl;
+      content.hidden = false;
+      shell.classList.add('is-unlocked');
+      passwordInput.value = '';
+      setStatus(isZh ? '验证成功，指南已解锁。' : 'Access granted. The guide is unlocked.', 'success');
+      content.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    } catch {
+      setStatus(isZh ? '密码错误或加密文件暂不可用。' : 'Incorrect password or the encrypted file is unavailable.', 'error');
+      passwordInput.select();
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  addEventListener('beforeunload', () => {
+    if (guideBlobUrl) URL.revokeObjectURL(guideBlobUrl);
+  });
+</script>

@@ -46,7 +46,7 @@ export const siteMeta = {
   descriptor: { zh: '人工智能 × 勘探地球物理', en: 'Artificial Intelligence × Exploration Geophysics' },
   email: 'jwm@pku.edu.cn',
   huggingFaceUrl: 'https://huggingface.co/GeoBrain',
-  guideFile: 'guides/geophysics-ai-onboarding.pdf',
+  guideEncryptedFile: 'guides/geophysics-ai-onboarding.enc',
   guideCover: 'guides/geophysics-ai-onboarding-cover.png',
   guidePages: 49,
   verifiedOn: '2026-08-29',
