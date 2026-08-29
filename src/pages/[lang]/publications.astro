@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PublicationCard from '../../components/PublicationCard.astro';
+import { languages, ui } from '../../lib/i18n';
+import { localize, members, researchAreas, siteMeta, type Lang } from '../../data/site';
+import { getValidatedPublications } from '../../lib/content';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const publications = await getValidatedPublications();
+const years = [...new Set(publications.map((item) => item.data.year))].sort((a, b) => b - a);
+const typeLabels = lang === 'zh' ? { journal: '期刊论文', conference: '会议论文', preprint: '预印本', review: '综述' } : { journal: 'Journal', conference: 'Conference', preprint: 'Preprint', review: 'Review' };
+---
+<BaseLayout lang={lang} title={t.nav.publications} description={lang === 'zh' ? 'GeoBrain 团队经过来源核验的论文成果，可按成员、年份、方向和类型筛选。' : 'Source-verified GeoBrain publications, filterable by member, year, topic and type.'}>
+  <section class="page-hero"><div class="shell page-hero-grid"><div><p class="eyebrow">Publications</p><h1 class="page-title">{lang === 'zh' ? '每一条成果，都保留可追溯的来源。' : 'Every record retains a traceable source.'}</h1></div><aside class="page-aside"><strong>{publications.length.toString().padStart(2, '0')}</strong>{lang === 'zh' ? '条论文记录通过机构主页、DOI 出版页面或 arXiv 作者信息完成身份核验。' : 'publication records verified through institutional profiles, DOI publisher pages or arXiv author data.'}</aside></div></section>
+  <section class="section-tight"><div class="shell">
+    <div class="filters" data-filters>
+      <div class="filter-field"><label for="member-filter">{lang === 'zh' ? '成员' : 'Member'}</label><select id="member-filter" data-filter="member"><option value="">{t.common.all}</option>{members.map((member) => <option value={member.id}>{localize(member.name, lang)}</option>)}</select></div>
+      <div class="filter-field"><label for="year-filter">{lang === 'zh' ? '年份' : 'Year'}</label><select id="year-filter" data-filter="year"><option value="">{t.common.all}</option>{years.map((year) => <option value={year}>{year}</option>)}</select></div>
+      <div class="filter-field"><label for="topic-filter">{lang === 'zh' ? '研究方向' : 'Topic'}</label><select id="topic-filter" data-filter="topic"><option value="">{t.common.all}</option>{researchAreas.map((area) => <option value={area.id}>{localize(area.title, lang)}</option>)}</select></div>
+      <div class="filter-field"><label for="type-filter">{lang === 'zh' ? '类型' : 'Type'}</label><select id="type-filter" data-filter="type"><option value="">{t.common.all}</option>{Object.entries(typeLabels).map(([id, label]) => <option value={id}>{label}</option>)}</select></div>
+      <button class="reset-button" type="button" data-reset>{t.common.reset}</button>
+    </div>
+    <div class="results-summary"><span><strong data-result-count>{publications.length}</strong> {lang === 'zh' ? '条成果' : 'records'}</span><span>{t.common.verified} {siteMeta.verifiedOn}</span></div>
+    <div class="publication-list" data-publication-list>{publications.map((publication) => <PublicationCard publication={publication} lang={lang} />)}</div>
+    <div class="empty-state" data-empty>{t.common.noResults}</div>
+  </div></section>
+  <script>
+    const controls = Array.from(document.querySelectorAll<HTMLSelectElement>('[data-filter]'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-publication]'));
+    const count = document.querySelector<HTMLElement>('[data-result-count]');
+    const empty = document.querySelector<HTMLElement>('[data-empty]');
+    const apply = () => {
+      const values = Object.fromEntries(controls.map((control) => [control.dataset.filter, control.value]));
+      let visible = 0;
+      for (const card of cards) {
+        const matches = (!values.member || card.dataset.members?.split(',').includes(values.member)) && (!values.year || card.dataset.year === values.year) && (!values.topic || card.dataset.topics?.split(',').includes(values.topic)) && (!values.type || card.dataset.type === values.type);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      }
+      if (count) count.textContent = String(visible);
+      if (empty) empty.style.display = visible ? 'none' : 'block';
+    };
+    controls.forEach((control) => control.addEventListener('change', apply));
+    document.querySelector('[data-reset]')?.addEventListener('click', () => { controls.forEach((control) => { control.value = ''; }); apply(); });
+  </script>
+</BaseLayout>

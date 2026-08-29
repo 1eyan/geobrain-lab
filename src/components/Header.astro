@@ -1,0 +1,49 @@
+---
+import { siteMeta } from '../data/site';
+import type { Lang } from '../data/site';
+import { pathFor, swapLanguagePath, ui } from '../lib/i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const currentPath = Astro.url.pathname;
+const otherLang = lang === 'zh' ? 'en' : 'zh';
+const nav = [
+  ['home', ''],
+  ['guide', 'guide'],
+  ['research', 'research'],
+  ['people', 'people'],
+  ['publications', 'publications'],
+  ['projects', 'projects'],
+  ['news', 'news'],
+] as const;
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href={pathFor(lang)} aria-label={`${siteMeta.shortName} ${t.nav.home}`}>
+      <img class="brand-logo" src={`${import.meta.env.BASE_URL}geobrain-logo.jpg`} alt="" width="50" height="50" />
+      <span class="brand-copy"><strong>GeoBrain</strong><small>{siteMeta.descriptor[lang]}</small></span>
+    </a>
+
+    <nav class="desktop-nav" aria-label={lang === 'zh' ? '主导航' : 'Primary navigation'}>
+      {nav.map(([key, route]) => {
+        const href = pathFor(lang, route);
+        const active = route === '' ? currentPath === href : currentPath.startsWith(href);
+        return <a href={href} aria-current={active ? 'page' : undefined}>{t.nav[key]}</a>;
+      })}
+    </nav>
+
+    <a class="language-switch" href={swapLanguagePath(lang, currentPath)} hreflang={otherLang} aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}>
+      <span>{lang === 'zh' ? 'EN' : '中文'}</span><span aria-hidden="true">↗</span>
+    </a>
+
+    <details class="mobile-menu">
+      <summary aria-label={lang === 'zh' ? '打开导航' : 'Open navigation'}><span></span><span></span></summary>
+      <div class="mobile-panel">
+        {nav.map(([key, route]) => <a href={pathFor(lang, route)}>{t.nav[key]}</a>)}
+        <a href={swapLanguagePath(lang, currentPath)} hreflang={otherLang}>{lang === 'zh' ? 'English' : '中文'}</a>
+      </div>
+    </details>
+  </div>
+</header>

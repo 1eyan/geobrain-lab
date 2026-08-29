@@ -1,0 +1,40 @@
+---
+import type { PublicationEntry } from '../lib/content';
+import type { Lang } from '../data/site';
+import { getMember, localize } from '../data/site';
+
+interface Props { publication: PublicationEntry; lang: Lang; compact?: boolean }
+const { publication, lang, compact = false } = Astro.props;
+const p = publication.data;
+const topicLabels = {
+  zh: { processing: '数据处理', inversion: '地球物理反演', algorithms: '人工智能算法', foundation: '基础大模型', agent: '地球物理 Agent' },
+  en: { processing: 'Processing', inversion: 'Inversion', algorithms: 'AI algorithms', foundation: 'Foundation models', agent: 'Geophysical agents' },
+};
+const statusLabels = {
+  zh: { published: '已发表', accepted: '已接收', preprint: '预印本', submitted: '已投稿', revised: '修回' },
+  en: { published: 'Published', accepted: 'Accepted', preprint: 'Preprint', submitted: 'Submitted', revised: 'Revised' },
+};
+---
+
+<article class:list={["publication-card", compact && "compact"]} data-publication data-year={p.year} data-type={p.type} data-members={p.members.join(',')} data-topics={p.topics.join(',')}>
+  <div class="publication-meta">
+    <span>{p.year}</span>
+    <span>{p.venue}</span>
+    <span class={`status status-${p.status}`}>{statusLabels[lang][p.status]}</span>
+  </div>
+  <h3><a href={p.url} target="_blank" rel="noopener noreferrer">{p.title}<span aria-hidden="true">↗</span></a></h3>
+  <p class="publication-authors">{p.authors.join(' · ')}</p>
+  {p.codeUrl && <a class="code-link" href={p.codeUrl} target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⌘</span>{p.codeLabel ?? (lang === 'zh' ? '论文代码' : 'Code repository')}<span aria-hidden="true">↗</span></a>}
+  {!compact && <p class="publication-summary">{lang === 'zh' ? p.summaryZh : p.summaryEn}</p>}
+  <div class="publication-foot">
+    <div class="tag-list">
+      {p.topics.map((topic) => <span>{topicLabels[lang][topic]}</span>)}
+    </div>
+    <div class="member-dots" aria-label={lang === 'zh' ? '团队作者' : 'Team authors'}>
+      {p.members.map((id) => {
+        const member = getMember(id);
+        return member && <span title={localize(member.name, lang)} style={`--dot:${member.accent}`}>{member.initials}</span>;
+      })}
+    </div>
+  </div>
+</article>

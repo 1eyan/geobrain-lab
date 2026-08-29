@@ -1,0 +1,50 @@
+{
+  "_instructions_zh": [
+    "请只填写能够确认属于本人或论文作者团队的公开网址；不确定时留空。",
+    "成员 GitHub 最好提供 github.com/<用户名>；论文代码请提供仓库主页，不要填下载链接。",
+    "如能提供身份或代码归属证据，请同时填写 source。提交后维护者会核验并移入网站正式数据。"
+  ],
+  "_instructions_en": [
+    "Only add public URLs that can be attributed to the member or paper authors; leave uncertain fields blank.",
+    "Use github.com/<username> for member profiles and repository homepages for paper code.",
+    "Add a source that supports identity or code ownership when available. Maintainers verify entries before publication."
+  ],
+  "officialPlatforms": {
+    "huggingFace": "https://huggingface.co/GeoBrain"
+  },
+  "members": {
+    "jianwei-ma": { "github": "", "homepage": "https://www.geophy.pku.edu.cn/people/majianwei/", "hitProfile": "https://homepage.hit.edu.cn/jma", "photoFile": "public/jianwei-ma.jpg", "photoSource": "https://www.geophy.pku.edu.cn/people/majianwei/", "googleScholar": "", "researchGate": "https://www.researchgate.net/profile/Jianwei-Ma-2", "orcid": "https://orcid.org/0000-0002-9803-0763", "source": "https://www.geophy.pku.edu.cn/people/majianwei/" },
+    "qi-liu": { "github": "https://github.com/sixseven42", "homepage": "https://sixseven42.github.io/", "photoFile": "public/member-photos/qi-liu.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "huggingFaceSpaces": ["https://huggingface.co/spaces/lqwyy/First_agent_template"], "source": "user-confirmed" },
+    "zhitong-cheng": { "github": "https://github.com/1eyan", "homepage": "", "photoFile": "public/member-photos/zhitong-cheng.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "https://scholar.google.com/citations?user=T4lifpIAAAAJ&hl=zh-CN", "researchGate": "", "orcid": "", "source": "user-confirmed" },
+    "tianxiang-gao": { "github": "", "homepage": "", "photoFile": "public/member-photos/tianxiang-gao.png", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "peng-hu": { "github": "", "homepage": "", "photoFile": "public/member-photos/peng-hu.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "chen-zhang": { "github": "", "homepage": "", "photoFile": "public/member-photos/chen-zhang.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "shirui-li": { "github": "", "homepage": "", "photoFile": "public/member-photos/shirui-li.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "wei-gao": { "github": "", "homepage": "", "photoFile": "public/member-photos/wei-gao.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "wenzhe-sheng": { "github": "", "homepage": "", "photoFile": "public/member-photos/wenzhe-sheng.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" },
+    "yulong-ge": { "github": "https://github.com/yulong-ge", "homepage": "", "photoFile": "public/member-photos/yulong-ge.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "https://www.researchgate.net/profile/Yulong-Ge-3", "orcid": "", "source": "https://www.researchgate.net/profile/Yulong-Ge-3" },
+    "yuying-cheng": { "github": "", "homepage": "", "photoFile": "public/member-photos/yuying-cheng.jpg", "photoSource": "https://github.com/sixseven42/seismic-benchmark/tree/main/public/team", "googleScholar": "", "researchGate": "", "orcid": "", "source": "" }
+  },
+  "publicationCode": {
+    "curvelet-transform": { "codeUrl": "", "source": "" },
+    "data-driven-tight-frame": { "codeUrl": "https://github.com/sevenysw/MathGeo", "source": "https://github.com/sevenysw/MathGeo" },
+    "deep-learning-denoising": { "codeUrl": "https://github.com/sevenysw/MathGeo", "source": "https://github.com/sevenysw/MathGeo" },
+    "deep-learning-geophysics": { "codeUrl": "", "source": "" },
+    "deep-learning-inversion": { "codeUrl": "https://github.com/YangFangShu/FCNVMB-Deep-learning-based-seismic-velocity-model-building", "source": "https://github.com/YangFangShu/FCNVMB-Deep-learning-based-seismic-velocity-model-building" },
+    "feature-space-planes-searcher": { "codeUrl": "https://github.com/baogegeJiang/FPS", "source": "https://github.com/baogegeJiang/FPS" },
+    "foundation-aided-interference-attenuation": { "codeUrl": "", "source": "" },
+    "foundation-driven-inversion": { "codeUrl": "", "source": "" },
+    "foundation-models-geophysics": { "codeUrl": "", "source": "" },
+    "fwigan": { "codeUrl": "https://github.com/YangFangShu/FWIGAN", "source": "https://github.com/YangFangShu/FWIGAN" },
+    "generative-interpolation": { "codeUrl": "", "source": "" },
+    "geoformer": { "codeUrl": "", "source": "" },
+    "hc-mvsnet": { "codeUrl": "", "source": "" },
+    "matrix-completion": { "codeUrl": "", "source": "" },
+    "pfedgm": { "codeUrl": "", "source": "" },
+    "robust-losses": { "codeUrl": "", "source": "" },
+    "seismology-modeling-agent": { "codeUrl": "https://github.com/RenYukun1563/specfem-mcp", "source": "https://arxiv.org/abs/2512.14429" },
+    "self-supervised-seismic-deblending": { "codeUrl": "", "source": "" },
+    "sensing-prior-constraints": { "codeUrl": "", "source": "" },
+    "spectral-ground-roll": { "codeUrl": "", "source": "" }
+  }
+}

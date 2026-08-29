@@ -1,0 +1,15 @@
+---
+const target = `${import.meta.env.BASE_URL}zh/`;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>GeoBrain 团队</title>
+    <script is:inline define:vars={{ target }}>window.location.replace(target);</script>
+  </head>
+  <body><a href={target}>进入 GeoBrain 团队网站</a></body>
+</html>

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { pathFor } from '../lib/i18n';
+---
+<BaseLayout lang="zh" title="页面未找到">
+  <section class="page-hero">
+    <div class="narrow">
+      <p class="eyebrow">404 · Not found</p>
+      <h1 class="page-title">这条地震道暂时没有记录。</h1>
+      <p class="lede">页面可能已经移动，或链接尚未完成更新。</p>
+      <div class="hero-actions"><a class="button button-primary" href={pathFor('zh')}>返回首页 <span>→</span></a></div>
+    </div>
+  </section>
+</BaseLayout>

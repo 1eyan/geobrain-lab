@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PublicationCard from '../../components/PublicationCard.astro';
+import { languages, pathFor, ui } from '../../lib/i18n';
+import { getMember, localize, researchAreas, type Lang } from '../../data/site';
+import { getValidatedPublications } from '../../lib/content';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const publications = await getValidatedPublications();
+---
+<BaseLayout lang={lang} title={t.nav.research} description={lang === 'zh' ? 'GeoBrain 团队的五个研究方向：地震数据处理、地球物理反演、人工智能算法、基础地球物理大模型与地球物理 Agent。' : 'GeoBrain research across seismic processing, geophysical inversion, AI algorithms, foundation models and geophysical agents.'}>
+  <section class="page-hero">
+    <div class="shell page-hero-grid">
+      <div><p class="eyebrow">Research</p><h1 class="page-title">{lang === 'zh' ? '从地震记录出发，走向通用地球物理智能。' : 'From seismic records to general-purpose geophysical intelligence.'}</h1></div>
+      <aside class="page-aside"><strong>05</strong>{lang === 'zh' ? '条研究路径共享一个目标：让数据驱动方法遵循物理、经得住验证，并能迁移到真实问题。' : 'connected paths share one goal: data-driven methods that respect physics, withstand validation and transfer to real problems.'}</aside>
+    </div>
+  </section>
+  <section class="section-tight"><div class="shell">
+    {researchAreas.map((area) => {
+      const related = publications.filter((publication) => publication.data.topics.includes(area.id)).slice(0, 4);
+      const areaMembers = area.members.map(getMember).filter(Boolean);
+      return <article class="area-detail" id={area.id}>
+        <div class="area-heading"><span class="area-id">{area.index}</span><h2>{localize(area.title, lang)}</h2><p class="area-short">{localize(area.short, lang)}</p><div class="area-member-list" aria-label={lang === 'zh' ? '相关成员' : 'Related members'}>{areaMembers.map((member) => member && <a href={pathFor(lang, `people/${member.id}`)} title={localize(member.name, lang)} style={`--dot:${member.accent}`}><b>{member.initials}</b><span>{localize(member.name, lang)}</span></a>)}</div></div>
+        <div class="area-copy"><p>{localize(area.description, lang)}</p><h3>{lang === 'zh' ? '研究方法与工作流' : 'Methods and workstreams'}</h3><div class="method-list">{area.methods.map((method) => <span>{localize(method, lang)}</span>)}</div><h3>{lang === 'zh' ? '核心问题' : 'Core questions'}</h3><ol class="question-list">{area.questions.map((question) => <li>{localize(question, lang)}</li>)}</ol>{area.resources?.length && <div class="area-resources"><h3>{lang === 'zh' ? '公开工具与演示' : 'Public tools and demos'}</h3>{area.resources.map((resource) => <a href={resource.url} target="_blank" rel="noopener noreferrer"><strong>{resource.label}<span aria-hidden="true">↗</span></strong><small>{localize(resource.description, lang)}</small></a>)}</div>}</div>
+        <div class="area-publications"><div class="area-publications-head"><h3>{lang === 'zh' ? '相关已核验成果' : 'Related verified work'}</h3><span>{related.length.toString().padStart(2, '0')}</span></div>{related.length ? <div class="publication-list">{related.map((publication) => <PublicationCard publication={publication} lang={lang} compact />)}</div> : <div class="research-empty"><strong>{lang === 'zh' ? '新研究主线' : 'Emerging research line'}</strong><p>{lang === 'zh' ? '相关成果将在论文或代码公开并完成身份核验后加入。' : 'Work will be added after publication or code release and identity verification.'}</p></div>}</div>
+      </article>;
+    })}
+  </div></section>
+</BaseLayout>

@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { languages, pathFor, ui } from '../../../lib/i18n';
+import { type Lang } from '../../../data/site';
+import { getSortedNews } from '../../../lib/content';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const news = await getSortedNews();
+const date = (value: Date) => new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-GB', { year: 'numeric', month: 'long', day: '2-digit' }).format(value);
+---
+<BaseLayout lang={lang} title={t.nav.news} description={lang === 'zh' ? 'GeoBrain 团队项目、论文与团队动态。' : 'Project, publication and team updates from GeoBrain.'}>
+  <section class="page-hero"><div class="shell page-hero-grid"><div><p class="eyebrow">News & updates</p><h1 class="page-title">{lang === 'zh' ? '记录研究如何一步步成为公共资源。' : 'Tracing how research becomes a public resource.'}</h1></div><aside class="page-aside"><strong>{news.length.toString().padStart(2, '0')}</strong>{lang === 'zh' ? '条经过来源核对的项目与团队动态。' : 'source-checked project and team updates.'}</aside></div></section>
+  <section class="section-tight"><div class="shell news-grid">{news.map((item) => <article class="news-card"><time datetime={item.data.date.toISOString()}>{date(item.data.date)}</time><h2>{lang === 'zh' ? item.data.titleZh : item.data.titleEn}</h2><p>{lang === 'zh' ? item.data.summaryZh : item.data.summaryEn}</p><a class="text-link" href={pathFor(lang, `news/${item.id}`)}>{t.common.learnMore}<span>→</span></a></article>)}</div></section>
+</BaseLayout>

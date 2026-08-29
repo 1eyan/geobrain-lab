@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://re-Gwen.github.io/geobrain-lab/sitemap-index.xml

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { languages, pathFor, ui } from '../../../lib/i18n';
+import { type Lang } from '../../../data/site';
+import { getSortedNews, type NewsEntry } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const items = await getSortedNews();
+  return languages.flatMap((lang) => items.map((item) => ({ params: { lang, slug: item.id }, props: { lang, item } })));
+}
+interface Props { lang: Lang; item: NewsEntry }
+const { lang, item } = Astro.props;
+const t = ui[lang];
+const date = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-GB', { year: 'numeric', month: 'long', day: '2-digit' }).format(item.data.date);
+const title = lang === 'zh' ? item.data.titleZh : item.data.titleEn;
+---
+<BaseLayout lang={lang} title={title} description={lang === 'zh' ? item.data.summaryZh : item.data.summaryEn}>
+  <article><header class="article-head"><div class="narrow"><a class="text-link" href={pathFor(lang, 'news')}>← {t.nav.news}</a><time datetime={item.data.date.toISOString()}>{date}</time><h1 class="page-title">{title}</h1><p class="lede">{lang === 'zh' ? item.data.summaryZh : item.data.summaryEn}</p></div></header><div class="narrow article-body"><p>{lang === 'zh' ? item.data.bodyZh : item.data.bodyEn}</p><p class="article-source"><a class="text-link" href="https://sixseven42.github.io/seismic-benchmark/" target="_blank" rel="noopener noreferrer">SeismicBench · {lang === 'zh' ? '项目来源' : 'Project source'}<span>↗</span></a></p></div></article>
+</BaseLayout>

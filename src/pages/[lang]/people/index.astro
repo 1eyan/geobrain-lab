@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { languages, pathFor, ui } from '../../../lib/i18n';
+import { localize, members, type Lang } from '../../../data/site';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<BaseLayout lang={lang} title={t.nav.people} description={lang === 'zh' ? 'GeoBrain 团队成员与研究角色。' : 'People and research roles in the GeoBrain Research Group.'}>
+  <section class="page-hero"><div class="shell page-hero-grid"><div><p class="eyebrow">People</p><h1 class="page-title">{lang === 'zh' ? '共同建设开放、严谨的地球物理智能。' : 'Building open and rigorous geophysical intelligence together.'}</h1></div><aside class="page-aside"><strong>{members.length.toString().padStart(2, '0')}</strong>{lang === 'zh' ? '位成员来自相互连接的研究与工程角色。个人单位仅在有可靠公开来源时展示。' : 'members across connected research and engineering roles. Individual affiliations appear only when publicly verified.'}</aside></div></section>
+  <section class="section-tight"><div class="shell people-grid">
+    {members.map((member, index) => <a class:list={["person-card", index === 0 && "leader-card"]} href={pathFor(lang, `people/${member.id}`)}><div class="person-avatar" style={`--avatar:${member.accent}`}>{member.photo ? <img src={`${import.meta.env.BASE_URL}${member.photo}`} alt={localize(member.name, lang)} width="180" height="220" loading="lazy" /> : member.initials}</div><div class="person-content"><h2>{localize(member.name, lang)}</h2><p class="role">{localize(member.role, lang)}</p><p class="bio">{localize(member.bio, lang)}</p><span class="text-link">{t.common.learnMore}<span>→</span></span></div></a>)}
+  </div></section>
+</BaseLayout>

@@ -1,0 +1,7 @@
+<div class="wave-field" aria-hidden="true">
+  <div class="wave-grid"></div>
+  {Array.from({ length: 13 }).map((_, index) => (
+    <span class="wave-trace" style={`--i:${index}; --phase:${(index % 4) * 0.35}s`}></span>
+  ))}
+  <div class="wave-depth"><span>0.0</span><span>1.2</span><span>2.4 km</span></div>
+</div>
