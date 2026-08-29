@@ -28,6 +28,18 @@ export interface ResearchArea {
   resources?: { label: string; url: string; description: Localized }[];
 }
 
+export type ProjectStatus = 'ongoing' | 'completed';
+
+export interface LabProject {
+  id: string;
+  name: Localized;
+  summary: Localized;
+  topic: Localized;
+  status: ProjectStatus;
+  members: { id: string; lead?: boolean }[];
+  verifiedOn: string;
+}
+
 export const siteMeta = {
   name: { zh: 'GeoBrain 团队', en: 'GeoBrain Research Group' },
   shortName: 'GeoBrain',
@@ -252,6 +264,99 @@ export const members: Member[] = [
   },
 ];
 
+export const labProjects: LabProject[] = [
+  {
+    id: 'nanjing-prestack-foundation-model',
+    name: { zh: '南京物探院叠前信号处理大模型', en: 'Nanjing Institute Prestack Signal-Processing Foundation Model' },
+    summary: { zh: '面向叠前地震信号处理的大模型研发项目。', en: 'A foundation-model project for prestack seismic signal processing.' },
+    topic: { zh: '信号处理 · 大模型', en: 'Signal processing · Foundation models' },
+    status: 'ongoing',
+    members: [
+      { id: 'tianxiang-gao', lead: true }, { id: 'qi-liu' }, { id: 'zhitong-cheng' },
+      { id: 'peng-hu' }, { id: 'chen-zhang' }, { id: 'wei-gao' }, { id: 'yuying-cheng' },
+    ],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'bgp-prestack-foundation-model',
+    name: { zh: '东方（BGP）叠前信号处理大模型', en: 'BGP Prestack Signal-Processing Foundation Model' },
+    summary: { zh: '面向叠前地震信号处理的大模型研发项目。', en: 'A foundation-model project for prestack seismic signal processing.' },
+    topic: { zh: '信号处理 · 大模型', en: 'Signal processing · Foundation models' },
+    status: 'ongoing',
+    members: [
+      { id: 'tianxiang-gao', lead: true }, { id: 'qi-liu' }, { id: 'zhitong-cheng' },
+      { id: 'peng-hu' }, { id: 'chen-zhang' }, { id: 'wei-gao' }, { id: 'yuying-cheng' },
+    ],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'multimodal-foundation-model',
+    name: { zh: '多模态通用大模型', en: 'Multimodal General Foundation Model' },
+    summary: { zh: '面向多模态叠后地震信号处理的通用大模型项目。', en: 'A general foundation-model project for multimodal poststack seismic signal processing.' },
+    topic: { zh: '多模态叠后信号处理', en: 'Multimodal poststack signal processing' },
+    status: 'ongoing',
+    members: [
+      { id: 'tianxiang-gao', lead: true }, { id: 'qi-liu' }, { id: 'zhitong-cheng' },
+      { id: 'peng-hu' }, { id: 'chen-zhang' }, { id: 'wei-gao' }, { id: 'yuying-cheng' },
+    ],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'changqing-regularization',
+    name: { zh: '长庆规则化项目', en: 'Changqing Seismic Regularization Project' },
+    summary: { zh: '围绕地震数据规则化开展方法研发与应用验证。', en: 'Method development and application validation for seismic data regularization.' },
+    topic: { zh: '规则化', en: 'Seismic regularization' },
+    status: 'ongoing',
+    members: [{ id: 'zhitong-cheng', lead: true }, { id: 'wei-gao' }],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'bgp-five-dimensional-regularization',
+    name: { zh: '东方五维规则化', en: 'BGP Five-Dimensional Regularization' },
+    summary: { zh: '已完成的五维地震数据规则化项目。', en: 'A completed project on five-dimensional seismic data regularization.' },
+    topic: { zh: '规则化', en: 'Seismic regularization' },
+    status: 'completed',
+    members: [{ id: 'zhitong-cheng' }, { id: 'qi-liu' }, { id: 'tianxiang-gao' }, { id: 'shirui-li' }],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'loess-plateau-denoising',
+    name: { zh: '黄土塬去噪', en: 'Loess Plateau Denoising' },
+    summary: { zh: '针对黄土塬地震资料的面波压制项目。', en: 'A ground-roll attenuation project for seismic data acquired in loess plateau settings.' },
+    topic: { zh: '面波压制', en: 'Ground-roll attenuation' },
+    status: 'completed',
+    members: [{ id: 'tianxiang-gao' }, { id: 'qi-liu' }, { id: 'peng-hu' }],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'nanjing-deblending',
+    name: { zh: '南京去混叠', en: 'Nanjing Seismic Deblending' },
+    summary: { zh: '面向混采地震数据的去混叠处理项目。', en: 'A deblending project for blended seismic acquisition data.' },
+    topic: { zh: '去混叠', en: 'Seismic deblending' },
+    status: 'completed',
+    members: [{ id: 'peng-hu' }],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'nearby-vessel-interference',
+    name: { zh: '临船干扰', en: 'Nearby-Vessel Interference Attenuation' },
+    summary: { zh: '面向海上地震采集临船干扰的信号处理项目。', en: 'A signal-processing project for nearby-vessel interference in marine seismic acquisition.' },
+    topic: { zh: '信号处理', en: 'Signal processing' },
+    status: 'completed',
+    members: [{ id: 'qi-liu' }],
+    verifiedOn: '2026-08-29',
+  },
+  {
+    id: 'rugged-seafloor-mechanism',
+    name: { zh: '崎岖海底机理研究', en: 'Rugged Seafloor Mechanism Study' },
+    summary: { zh: '研究崎岖海底条件下的地震波传播机理。', en: 'A study of seismic-wave propagation mechanisms under rugged seafloor conditions.' },
+    topic: { zh: '地震波传播', en: 'Seismic-wave propagation' },
+    status: 'completed',
+    members: [{ id: 'qi-liu' }],
+    verifiedOn: '2026-08-29',
+  },
+];
+
 export const seismicBench = {
   name: 'SeismicBench',
   label: { zh: '代表项目', en: 'Featured project' },
@@ -292,10 +397,15 @@ export function getMember(id: string) {
   return members.find((member) => member.id === id);
 }
 
+export function getProjectsForMember(memberId: string) {
+  return labProjects.filter((project) => project.members.some((participant) => participant.id === memberId));
+}
+
 function validateSiteData() {
   const errors: string[] = [];
   const memberIds = new Set<string>();
   const areaIds = new Set<string>();
+  const projectIds = new Set<string>();
 
   for (const member of members) {
     if (memberIds.has(member.id)) errors.push(`Duplicate member id: ${member.id}`);
@@ -329,6 +439,24 @@ function validateSiteData() {
       } catch {
         errors.push(`Invalid resource link for ${area.id}: ${resource.url}`);
       }
+    }
+  }
+
+  for (const project of labProjects) {
+    if (projectIds.has(project.id)) errors.push(`Duplicate project id: ${project.id}`);
+    projectIds.add(project.id);
+    if (!project.name.zh || !project.name.en || !project.summary.zh || !project.summary.en) {
+      errors.push(`Missing bilingual project content: ${project.id}`);
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(project.verifiedOn)) {
+      errors.push(`Invalid project verification date: ${project.id}`);
+    }
+    if (project.members.length === 0) errors.push(`Project has no GeoBrain members: ${project.id}`);
+    const projectMemberIds = new Set<string>();
+    for (const participant of project.members) {
+      if (!memberIds.has(participant.id)) errors.push(`Unknown member ${participant.id} in project ${project.id}`);
+      if (projectMemberIds.has(participant.id)) errors.push(`Duplicate member ${participant.id} in project ${project.id}`);
+      projectMemberIds.add(participant.id);
     }
   }
 

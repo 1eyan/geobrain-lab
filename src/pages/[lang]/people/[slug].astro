@@ -2,7 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PublicationCard from '../../../components/PublicationCard.astro';
 import { languages, pathFor, ui } from '../../../lib/i18n';
-import { localize, members, type Lang, type Member } from '../../../data/site';
+import { getProjectsForMember, localize, members, type Lang, type Member } from '../../../data/site';
 import { getValidatedPublications } from '../../../lib/content';
 
 export function getStaticPaths() {
@@ -12,8 +12,13 @@ interface Props { lang: Lang; member: Member }
 const { lang, member } = Astro.props;
 const t = ui[lang];
 const publications = (await getValidatedPublications()).filter((item) => item.data.members.includes(member.id));
+const projects = getProjectsForMember(member.id);
 ---
 <BaseLayout lang={lang} title={localize(member.name, lang)} description={localize(member.bio, lang)}>
   <section class="profile-hero"><div class="shell profile-grid"><div class="profile-avatar" style={`--avatar:${member.accent}`}>{member.photo ? <img src={`${import.meta.env.BASE_URL}${member.photo}`} alt={localize(member.name, lang)} width="420" height="520" /> : member.initials}</div><div><p class="eyebrow">GeoBrain · People</p><h1 class="page-title">{localize(member.name, lang)}</h1><p class="profile-role">{localize(member.role, lang)}</p><p class="profile-bio">{localize(member.bio, lang)}</p>{member.affiliation && <p class="profile-affiliation">{localize(member.affiliation, lang)}</p>}<div class="keyword-row">{member.keywords.map((keyword) => <span>{localize(keyword, lang)}</span>)}</div>{member.links && <div class="profile-links">{member.links.map((link) => <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}</div>}{member.photoSource && <p class="photo-credit">{lang === 'zh' ? '照片来源：' : 'Photo: '}<a href={member.photoSource} target="_blank" rel="noopener noreferrer">{member.id === 'jianwei-ma' ? (lang === 'zh' ? '北京大学官方教师主页' : 'Official PKU faculty profile') : (lang === 'zh' ? 'SeismicBench 授权团队照片' : 'Authorized SeismicBench team photo')} ↗</a></p>}</div></div></section>
+  {projects.length > 0 && <section class="section section-rule profile-project-section"><div class="shell"><div class="kicker-row"><div><p class="eyebrow">Project involvement</p><h2 class="section-title">{lang === 'zh' ? '参与项目' : 'Project involvement'}</h2></div><a class="text-link" href={pathFor(lang, 'projects')}>{t.nav.projects}<span>→</span></a></div><div class="profile-project-grid">{projects.map((project) => {
+    const participation = project.members.find((participant) => participant.id === member.id);
+    return <a class="profile-project-card" href={`${pathFor(lang, 'projects')}#${project.id}`}><div><span class:list={['project-status', `project-status-${project.status}`]}>{project.status === 'ongoing' ? (lang === 'zh' ? '在研' : 'Ongoing') : (lang === 'zh' ? '已完成' : 'Completed')}</span>{participation?.lead && <span class="project-lead-label">{lang === 'zh' ? '项目负责' : 'Project lead'}</span>}</div><h3>{localize(project.name, lang)}</h3><p>{localize(project.topic, lang)}</p><span class="text-link">{lang === 'zh' ? '查看项目' : 'View project'}<span>→</span></span></a>;
+  })}</div></div></section>}
   <section class="section section-rule"><div class="shell"><div class="kicker-row"><div><p class="eyebrow">Verified work</p><h2 class="section-title">{lang === 'zh' ? '已核验成果' : 'Verified publications'}</h2></div><a class="text-link" href={pathFor(lang, 'publications')}>{t.nav.publications}<span>→</span></a></div>{publications.length ? <div class="publication-list">{publications.map((publication) => <PublicationCard publication={publication} lang={lang} />)}</div> : <div class="empty-state" style="display:block">{lang === 'zh' ? '暂未找到能够消除同名歧义的公开论文记录。' : 'No public publication record has yet passed identity disambiguation.'}</div>}</div></section>
 </BaseLayout>
