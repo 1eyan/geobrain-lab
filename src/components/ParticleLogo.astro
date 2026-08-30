@@ -1,0 +1,417 @@
+---
+const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
+---
+
+<div class="particle-logo" data-particle-logo data-logo-src={logoUrl} aria-hidden="true">
+  <canvas aria-hidden="true"></canvas>
+  <img class="particle-logo-fallback" src={logoUrl} alt="" width="1254" height="1254" />
+  <div class="particle-noise" aria-hidden="true"></div>
+  <div class="particle-wordmark" aria-hidden="true">
+    <div class="wordmark-layer wordmark-dust">
+      <strong>Geo<span>Brain</span></strong>
+      <small>AI FOR GEOPHYSICS</small>
+    </div>
+    <div class="wordmark-layer wordmark-clear">
+      <strong>Geo<span>Brain</span></strong>
+      <small>AI FOR GEOPHYSICS</small>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const hoverQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    document.querySelectorAll('[data-particle-logo]').forEach((root) => {
+      if (root.dataset.particleReady === 'true') return;
+      root.dataset.particleReady = 'true';
+
+      const canvas = root.querySelector('canvas');
+      const ctx = canvas?.getContext('2d');
+      const source = root.dataset.logoSrc;
+      const interactionSurface = root.closest('.hero') || root;
+      if (!canvas || !ctx || !source) return;
+
+      const particles = [];
+      const pointer = { x: 0, y: 0, active: false };
+      let width = 0;
+      let height = 0;
+      let frame = 0;
+      let start = performance.now();
+      let visible = true;
+      let touchFadeTimer = 0;
+      let wordmarkTarget = hoverQuery.matches ? .015 : .12;
+      let wordmarkCurrent = wordmarkTarget;
+
+      const resize = () => {
+        const box = root.getBoundingClientRect();
+        width = Math.max(1, box.width);
+        height = Math.max(1, box.height);
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+
+      const position = (particle) => {
+        const compact = width < 760;
+        const size = compact
+          ? Math.min(width * .94, height * .67, 520)
+          : Math.min(width * .58, height * .9, 720);
+        const centerX = compact ? width * .54 : width * .74;
+        const centerY = compact ? height * .67 : height * .52;
+        return {
+          x: centerX - size / 2 + particle.u * size,
+          y: centerY - size / 2 + particle.v * size,
+          size,
+        };
+      };
+
+      const particleReveal = (x, y) => {
+        const base = hoverQuery.matches ? .012 : .1;
+        if (!pointer.active) return base;
+        const distance = Math.hypot(x - pointer.x, y - pointer.y);
+        const radius = width < 760 ? 190 : 285;
+        const linear = Math.max(0, 1 - distance / radius);
+        const eased = linear * linear * (3 - 2 * linear);
+        return Math.min(1, base + eased * .988);
+      };
+
+      const updateWordmarkReveal = () => {
+        const compact = width < 760;
+        const centerX = width * (compact ? .54 : .74);
+        const centerY = height * (compact ? .79 : .76);
+        const radius = compact ? 210 : 300;
+        const base = hoverQuery.matches ? .015 : .12;
+        const distance = pointer.active ? Math.hypot(pointer.x - centerX, pointer.y - centerY) : radius;
+        const linear = pointer.active ? Math.max(0, 1 - distance / radius) : 0;
+        const reveal = Math.min(1, base + linear * linear * (3 - 2 * linear));
+        wordmarkTarget = reveal;
+      };
+
+      const animateWordmark = () => {
+        if (motionQuery.matches) {
+          wordmarkCurrent = wordmarkTarget;
+        } else {
+          const speed = wordmarkTarget > wordmarkCurrent ? .028 : .052;
+          wordmarkCurrent += (wordmarkTarget - wordmarkCurrent) * speed;
+        }
+        const clear = Math.max(0, Math.min(1, (wordmarkCurrent - .24) / .76));
+        const dust = Math.min(1, wordmarkCurrent * 2.8) * (1 - clear * .68);
+        root.style.setProperty('--wordmark-dust-opacity', dust.toFixed(3));
+        root.style.setProperty('--wordmark-clear-opacity', clear.toFixed(3));
+        root.style.setProperty('--wordmark-clear-blur', `${((1 - clear) * 8).toFixed(2)}px`);
+        root.style.setProperty('--wordmark-lift', `${((1 - wordmarkCurrent) * 8).toFixed(2)}px`);
+      };
+
+      const drawStatic = () => {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((particle) => {
+          const target = position(particle);
+          ctx.globalAlpha = particle.alpha * particleReveal(target.x, target.y);
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(target.x, target.y, Math.max(.65, target.size / 510 * particle.radius), 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      };
+
+      const animate = (now) => {
+        if (!visible) {
+          frame = requestAnimationFrame(animate);
+          return;
+        }
+
+        animateWordmark();
+        const reduced = motionQuery.matches;
+        if (reduced) {
+          drawStatic();
+          frame = requestAnimationFrame(animate);
+          return;
+        }
+
+        const elapsed = Math.min(1, (now - start) / 1700);
+        const assemble = 1 - Math.pow(1 - elapsed, 4);
+        ctx.clearRect(0, 0, width, height);
+        ctx.globalCompositeOperation = 'source-over';
+
+        particles.forEach((particle, index) => {
+          const target = position(particle);
+          const drift = Math.sin(now * .00072 + particle.phase) * 1.25;
+          let tx = target.x + drift;
+          let ty = target.y + Math.cos(now * .0006 + particle.phase) * 1.05;
+          const reveal = particleReveal(target.x, target.y);
+
+          if (pointer.active) {
+            const dx = target.x - pointer.x;
+            const dy = target.y - pointer.y;
+            const distance = Math.hypot(dx, dy) || 1;
+            const radius = Math.min(142, width * .24);
+            if (distance < radius) {
+              const force = Math.pow(1 - distance / radius, 2) * 14;
+              tx += dx / distance * force;
+              ty += dy / distance * force;
+            }
+          }
+
+          if (elapsed < 1) {
+            tx = particle.sx + (tx - particle.sx) * assemble;
+            ty = particle.sy + (ty - particle.sy) * assemble;
+          }
+
+          particle.vx += (tx - particle.x) * .052;
+          particle.vy += (ty - particle.y) * .052;
+          particle.vx *= .82;
+          particle.vy *= .82;
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+
+          const shimmer = .78 + Math.sin(now * .0012 + index * .19) * .18;
+          ctx.globalAlpha = particle.alpha * shimmer * Math.min(1, elapsed * 1.6 + .08) * reveal;
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, Math.max(.6, target.size / 510 * particle.radius), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        frame = requestAnimationFrame(animate);
+      };
+
+      const burst = (x = width / 2, y = height / 2) => {
+        particles.forEach((particle) => {
+          const dx = particle.x - x;
+          const dy = particle.y - y;
+          const distance = Math.hypot(dx, dy) || 1;
+          const force = Math.max(0, 1 - distance / Math.max(width, height)) * (4 + Math.random() * 9);
+          particle.vx += dx / distance * force;
+          particle.vy += dy / distance * force;
+        });
+      };
+
+      const updatePointer = (event) => {
+        const box = root.getBoundingClientRect();
+        pointer.x = event.clientX - box.left;
+        pointer.y = event.clientY - box.top;
+        pointer.active = true;
+        updateWordmarkReveal();
+      };
+
+      interactionSurface.addEventListener('pointermove', updatePointer, { passive: true });
+      interactionSurface.addEventListener('pointerenter', updatePointer, { passive: true });
+      interactionSurface.addEventListener('pointerleave', () => {
+        pointer.active = false;
+        updateWordmarkReveal();
+      });
+      interactionSurface.addEventListener('pointerdown', (event) => {
+        updatePointer(event);
+        burst(pointer.x, pointer.y);
+        if (!hoverQuery.matches) {
+          window.clearTimeout(touchFadeTimer);
+          touchFadeTimer = window.setTimeout(() => {
+            pointer.active = false;
+            updateWordmarkReveal();
+          }, 1500);
+        }
+      }, { passive: true });
+
+      const image = new Image();
+      image.decoding = 'async';
+      image.addEventListener('load', () => {
+        const sampleSize = 282;
+        const sampler = document.createElement('canvas');
+        sampler.width = sampleSize;
+        sampler.height = sampleSize;
+        const sampleCtx = sampler.getContext('2d', { willReadFrequently: true });
+        if (!sampleCtx) return;
+        sampleCtx.drawImage(image, 0, 0, sampleSize, sampleSize);
+        const pixels = sampleCtx.getImageData(0, 0, sampleSize, sampleSize).data;
+
+        resize();
+        for (let y = 0; y < sampleSize; y += 3) {
+          for (let x = 0; x < sampleSize; x += 3) {
+            const offset = (y * sampleSize + x) * 4;
+            const r = pixels[offset];
+            const g = pixels[offset + 1];
+            const b = pixels[offset + 2];
+            const a = pixels[offset + 3] / 255;
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+            if (a < .2 || (brightness > 239 && chroma < 15)) continue;
+
+            const u = x / sampleSize;
+            const v = y / sampleSize;
+            if (v > .635) continue;
+            const target = position({ u, v });
+            const angle = Math.random() * Math.PI * 2;
+            const scatter = 70 + Math.random() * Math.max(width, height) * .7;
+            particles.push({
+              u,
+              v,
+              x: target.x + Math.cos(angle) * scatter,
+              y: target.y + Math.sin(angle) * scatter,
+              sx: target.x + Math.cos(angle) * scatter,
+              sy: target.y + Math.sin(angle) * scatter,
+              vx: 0,
+              vy: 0,
+              radius: brightness < 110 ? 1.42 : 1.08,
+              alpha: Math.min(1, .58 + (255 - brightness) / 245),
+              color: `rgb(${r},${g},${b})`,
+              phase: Math.random() * Math.PI * 2,
+            });
+          }
+        }
+
+        root.classList.add('is-ready');
+        updateWordmarkReveal();
+        start = performance.now();
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(animate);
+      }, { once: true });
+      image.src = source;
+
+      const resizeObserver = new ResizeObserver(() => resize());
+      resizeObserver.observe(root);
+      const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: .02 });
+      visibilityObserver.observe(root);
+    });
+  })();
+</script>
+
+<style>
+  .particle-logo {
+    --wordmark-dust-opacity: .03;
+    --wordmark-clear-opacity: 0;
+    --wordmark-clear-blur: 8px;
+    --wordmark-lift: 7px;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    color: #eaf4ff;
+    isolation: isolate;
+    pointer-events: none;
+  }
+  .particle-logo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-image:
+      linear-gradient(rgba(126, 182, 255, .045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126, 182, 255, .045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: linear-gradient(90deg, transparent 8%, black 58%, black 100%);
+  }
+  .particle-logo::after {
+    content: "";
+    position: absolute;
+    top: 4%;
+    right: -7%;
+    bottom: -10%;
+    left: 42%;
+    z-index: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, transparent 0 32%, rgba(106,168,255,.07) 32.2% 32.5%, transparent 32.8% 46%, rgba(90,216,204,.05) 46.2% 46.5%, transparent 46.8%);
+    animation: particle-orbit 9s ease-in-out infinite alternate;
+  }
+  canvas { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; opacity: .96; mask-image: linear-gradient(90deg, transparent 14%, rgba(0,0,0,.35) 42%, black 66%); }
+  .particle-logo-fallback {
+    position: absolute;
+    top: 52%;
+    left: 74%;
+    z-index: 2;
+    width: min(58%, 720px);
+    height: auto;
+    border-radius: 22px;
+    opacity: .025;
+    mix-blend-mode: screen;
+    clip-path: inset(0 0 36% 0);
+    transform: translate(-50%, -50%);
+    transition: opacity .45s ease;
+  }
+  .is-ready .particle-logo-fallback { opacity: 0; }
+  .particle-noise {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: .1;
+    background-image: radial-gradient(rgba(191, 222, 255, .75) .45px, transparent .6px);
+    background-size: 5px 5px;
+    mask-image: radial-gradient(circle at 50% 48%, black, transparent 75%);
+  }
+  .particle-wordmark {
+    position: absolute;
+    top: 76%;
+    left: 74%;
+    z-index: 5;
+    width: min(43vw, 590px);
+    color: #f2f7ff;
+    text-align: center;
+    text-shadow: 0 0 32px rgba(75, 146, 244, .22);
+    transform: translate(-50%, calc(-50% + var(--wordmark-lift)));
+    transition: transform .12s linear;
+  }
+  .wordmark-layer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+  }
+  .wordmark-layer + .wordmark-layer { position: absolute; inset: 0; }
+  .wordmark-dust {
+    opacity: var(--wordmark-dust-opacity);
+    filter: blur(.35px);
+    -webkit-mask-image: radial-gradient(circle, #000 0 1px, transparent 1.45px);
+    mask-image: radial-gradient(circle, #000 0 1px, transparent 1.45px);
+    -webkit-mask-size: 4px 4px;
+    mask-size: 4px 4px;
+    text-shadow: 0 0 14px rgba(105, 173, 255, .42);
+  }
+  .wordmark-clear {
+    opacity: var(--wordmark-clear-opacity);
+    filter: blur(var(--wordmark-clear-blur));
+  }
+  .wordmark-layer strong {
+    display: block;
+    font-family: "Avenir Next", Avenir, Montserrat, var(--sans);
+    font-size: clamp(3rem, 5.4vw, 5.75rem);
+    font-weight: 520;
+    line-height: .86;
+    letter-spacing: -.075em;
+  }
+  .wordmark-layer strong span {
+    color: #74aefb;
+    background: linear-gradient(90deg, #6da8fa, #5ed7cc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .wordmark-layer small {
+    margin-top: 18px;
+    margin-left: .42em;
+    color: rgba(218, 234, 253, .78);
+    font-size: clamp(.55rem, .72vw, .78rem);
+    font-weight: 760;
+    letter-spacing: .42em;
+  }
+  @keyframes particle-orbit { from { transform: scale(.94) rotate(-2deg); opacity: .42; } to { transform: scale(1.04) rotate(2deg); opacity: .88; } }
+  @media (max-width: 720px) {
+    .particle-logo::before { mask-image: linear-gradient(180deg, transparent 5%, black 50%, black 100%); }
+    .particle-logo::after { top: 38%; right: -20%; bottom: -14%; left: -20%; }
+    canvas { opacity: .62; mask-image: linear-gradient(180deg, transparent 20%, rgba(0,0,0,.4) 47%, black 70%); }
+    .particle-logo-fallback { top: 67%; left: 54%; width: min(94%, 520px); opacity: .04; }
+    .particle-wordmark { top: 79%; left: 54%; width: min(88vw, 520px); }
+    .wordmark-layer strong { font-size: clamp(2.55rem, 14vw, 4.6rem); }
+    .wordmark-layer small { margin-top: 13px; font-size: .52rem; letter-spacing: .3em; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .particle-logo::after { animation: none; }
+  }
+</style>

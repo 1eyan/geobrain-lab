@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ResearchLogoAssembly from '../../components/ResearchLogoAssembly.astro';
+import ParticleLogo from '../../components/ParticleLogo.astro';
 import PublicationCard from '../../components/PublicationCard.astro';
 import { languages, pathFor, ui } from '../../lib/i18n';
 import { localize, researchAreas, seismicBench, siteMeta, type Lang } from '../../data/site';
@@ -21,6 +21,7 @@ const date = (value: Date) => new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 
 
 <BaseLayout lang={lang}>
   <section class="hero">
+    <ParticleLogo />
     <div class="shell hero-grid">
       <div class="hero-copy">
         <p class="eyebrow">{t.home.eyebrow}</p>
@@ -36,7 +37,6 @@ const date = (value: Date) => new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 
         </div>
         <p class="hero-note"><span>{lang === 'zh' ? '开放学术基准与可复现研究' : 'Open benchmarks and reproducible research'}</span></p>
       </div>
-      <ResearchLogoAssembly lang={lang} />
     </div>
   </section>
 
