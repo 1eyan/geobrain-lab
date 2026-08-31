@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectAccessGate from '../../components/ProjectAccessGate.astro';
 import { languages, pathFor, ui } from '../../lib/i18n';
 import { getMember, labProjects, localize, seismicBench, type Lang } from '../../data/site';
 
@@ -21,6 +22,7 @@ const principles = lang === 'zh' ? [
 ---
 <BaseLayout lang={lang} title={lang === 'zh' ? '项目' : 'Projects'} description={lang === 'zh' ? 'GeoBrain 在研与已完成项目，以及代表性开放基准 SeismicBench。' : 'GeoBrain ongoing and completed projects, together with the featured open benchmark SeismicBench.'}>
   <section class="project-hero"><div class="shell project-hero-grid"><div><p class="eyebrow">{localize(seismicBench.label, lang)}</p><h1 class="page-title">SeismicBench</h1><p class="lede">{localize(seismicBench.summary, lang)}</p><div class="hero-actions"><a class="button button-primary" href={seismicBench.siteUrl} target="_blank" rel="noopener noreferrer">{t.common.visitProject}<span>↗</span></a><a class="button button-ghost" href={seismicBench.repoUrl} target="_blank" rel="noopener noreferrer">{t.common.sourceCode}<span>↗</span></a><a class="button button-ghost" href={seismicBench.modelsUrl} target="_blank" rel="noopener noreferrer">Hugging Face<span>↗</span></a></div></div><aside class="project-data-card"><img class="project-logo" src={seismicBench.logoUrl} alt="SeismicBench" width="125" height="125" /><div class="project-stats">{seismicBench.stats.map((stat) => <div class="project-stat"><strong>{stat.value}</strong><span>{localize(stat.label, lang)}</span></div>)}</div><p class="verified-note">{t.common.verified} {seismicBench.verifiedOn}</p></aside></div></section>
+  <ProjectAccessGate lang={lang}>
   <section class="section project-register"><div class="shell">
     <div class="kicker-row"><div><p class="eyebrow">Project portfolio</p><h2 class="section-title">{lang === 'zh' ? '团队项目清单' : 'Research project portfolio'}</h2></div><p class="lede">{lang === 'zh' ? `在研 ${ongoingProjects.length} 项 · 已完成 ${completedProjects.length} 项` : `${ongoingProjects.length} ongoing · ${completedProjects.length} completed`}</p></div>
     {[
@@ -40,6 +42,7 @@ const principles = lang === 'zh' ? [
       </article>)}</div>
     </div>)}
   </div></section>
+  </ProjectAccessGate>
   <section class="section"><div class="shell"><div class="kicker-row"><div><p class="eyebrow">Benchmark tasks</p><h2 class="section-title">{lang === 'zh' ? '五类核心处理任务' : 'Five core processing tasks'}</h2></div><p class="lede">{lang === 'zh' ? '从数据完整性、噪声压制到关键信号拾取，形成可比较的评测路径。' : 'A comparable evaluation path spanning data completeness, noise suppression and key signal picking.'}</p></div><div class="task-grid">{seismicBench.tasks.map((task) => <article class="task-card"><h3>{localize(task, lang)}</h3></article>)}</div></div></section>
   <section class="section section-rule"><div class="shell"><div class="kicker-row"><div><p class="eyebrow">Principles</p><h2 class="section-title">{lang === 'zh' ? '平台如何保持可信' : 'How the platform stays trustworthy'}</h2></div></div><div class="principle-grid">{principles.map(([title, copy]) => <article class="principle"><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
   <section class="section"><div class="shell"><div class="kicker-row"><div><p class="eyebrow">Milestones</p><h2 class="section-title">{lang === 'zh' ? '从启动到持续维护' : 'From launch to continuous maintenance'}</h2></div></div><div class="timeline">{seismicBench.milestones.map((item) => <div class="timeline-row"><time datetime={item.date}>{item.date}</time><p>{localize(item.text, lang)}</p></div>)}</div></div></section>

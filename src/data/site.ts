@@ -48,7 +48,7 @@ export const siteMeta = {
   huggingFaceUrl: 'https://huggingface.co/GeoBrain',
   guideEncryptedFile: 'guides/geophysics-ai-onboarding.enc',
   guideCover: 'guides/geophysics-ai-onboarding-cover.png',
-  guidePages: 49,
+  guidePages: 78,
   verifiedOn: '2026-08-29',
   profileUrl: 'https://www.geophy.pku.edu.cn/people/majianwei/',
 };

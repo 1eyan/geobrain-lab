@@ -46,7 +46,7 @@ const encryptedUrl = `${import.meta.env.BASE_URL}${siteMeta.guideEncryptedFile}`
         <form class="guide-access-form" data-guide-access>
           <label for={`guide-password-${lang}`}>{lang === 'zh' ? '访问密码' : 'Access password'}</label>
           <div>
-            <input id={`guide-password-${lang}`} name="password" type="password" inputmode="numeric" autocomplete="current-password" required />
+            <input id={`guide-password-${lang}`} name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required />
             <button class="button button-primary" type="submit">{lang === 'zh' ? '解锁指南' : 'Unlock guide'}</button>
           </div>
           <p class="guide-access-status" data-guide-status aria-live="polite"></p>

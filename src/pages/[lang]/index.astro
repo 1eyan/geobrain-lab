@@ -46,7 +46,7 @@ const date = (value: Date) => new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 
       <div class="guide-band-copy">
         <p class="eyebrow">Start here · 新成员必读</p>
         <h2 id="starter-guide-title">{lang === 'zh' ? '地球物理与人工智能新人培训手册' : 'Geophysics & AI Starter Handbook'}</h2>
-        <p>{lang === 'zh' ? '面向新入组研究生与本科生的 49 页入门路线，系统介绍地球物理任务、人工智能方法、科研工具与学习资源。网站始终指向最新版手册。' : 'A 49-page onboarding path for new graduate and undergraduate members, covering geophysical tasks, AI methods, research tools and learning resources. This site always points to the latest uploaded edition.'}</p>
+        <p>{lang === 'zh' ? '面向新入组研究生与本科生的 78 页入门路线，系统介绍地球物理任务、人工智能方法、科研工具与学习资源。网站始终指向最新版手册。' : 'A 78-page onboarding path for new graduate and undergraduate members, covering geophysical tasks, AI methods, research tools and learning resources. This site always points to the latest uploaded edition.'}</p>
         <div class="hero-actions">
           <a class="button button-primary" href={pathFor(lang, 'guide')}>{lang === 'zh' ? '阅读新手指南' : 'Read the guide'}<span>→</span></a>
           <a class="button button-ghost" href={pathFor(lang, 'guide')}>{lang === 'zh' ? '密码访问' : 'Password access'} · {siteMeta.guidePages} {lang === 'zh' ? '页' : 'pages'}<span>→</span></a>
