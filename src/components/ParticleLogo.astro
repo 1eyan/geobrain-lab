@@ -59,10 +59,10 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
       const position = (particle) => {
         const compact = width < 760;
         const size = compact
-          ? Math.min(width * .94, height * .67, 520)
-          : Math.min(width * .58, height * .9, 720);
-        const centerX = compact ? width * .54 : width * .74;
-        const centerY = compact ? height * .67 : height * .52;
+          ? Math.min(width * 1.18, height * .78, 620)
+          : Math.min(Math.max(width * 1.2, height * 1.38), 2040);
+        const centerX = compact ? width * .55 : width * .62;
+        const centerY = compact ? height * .67 : height * .55;
         return {
           x: centerX - size / 2 + particle.u * size,
           y: centerY - size / 2 + particle.v * size,
@@ -70,11 +70,14 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
         };
       };
 
+      const renderedRadius = (targetSize, particle) =>
+        Math.min(2.15, Math.max(.78, targetSize / 600)) * particle.radius;
+
       const particleReveal = (x, y) => {
         const base = hoverQuery.matches ? .012 : .1;
         if (!pointer.active) return base;
         const distance = Math.hypot(x - pointer.x, y - pointer.y);
-        const radius = width < 760 ? 190 : 285;
+        const radius = width < 760 ? 240 : Math.min(520, width * .36);
         const linear = Math.max(0, 1 - distance / radius);
         const eased = linear * linear * (3 - 2 * linear);
         return Math.min(1, base + eased * .988);
@@ -82,9 +85,9 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
 
       const updateWordmarkReveal = () => {
         const compact = width < 760;
-        const centerX = width * (compact ? .54 : .74);
-        const centerY = height * (compact ? .79 : .76);
-        const radius = compact ? 210 : 300;
+        const centerX = width * (compact ? .55 : .62);
+        const centerY = height * (compact ? .8 : .78);
+        const radius = compact ? 225 : Math.min(420, width * .32);
         const base = hoverQuery.matches ? .015 : .12;
         const distance = pointer.active ? Math.hypot(pointer.x - centerX, pointer.y - centerY) : radius;
         const linear = pointer.active ? Math.max(0, 1 - distance / radius) : 0;
@@ -111,10 +114,10 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
         ctx.clearRect(0, 0, width, height);
         particles.forEach((particle) => {
           const target = position(particle);
-          ctx.globalAlpha = particle.alpha * particleReveal(target.x, target.y);
+          ctx.globalAlpha = Math.min(1, particle.alpha * particleReveal(target.x, target.y) * 1.32);
           ctx.fillStyle = particle.color;
           ctx.beginPath();
-          ctx.arc(target.x, target.y, Math.max(.65, target.size / 510 * particle.radius), 0, Math.PI * 2);
+          ctx.arc(target.x, target.y, Math.max(.65, renderedRadius(target.size, particle)), 0, Math.PI * 2);
           ctx.fill();
         });
         ctx.globalAlpha = 1;
@@ -150,7 +153,7 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
             const dx = target.x - pointer.x;
             const dy = target.y - pointer.y;
             const distance = Math.hypot(dx, dy) || 1;
-            const radius = Math.min(142, width * .24);
+            const radius = Math.min(220, width * .28);
             if (distance < radius) {
               const force = Math.pow(1 - distance / radius, 2) * 14;
               tx += dx / distance * force;
@@ -171,10 +174,10 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
           particle.y += particle.vy;
 
           const shimmer = .78 + Math.sin(now * .0012 + index * .19) * .18;
-          ctx.globalAlpha = particle.alpha * shimmer * Math.min(1, elapsed * 1.6 + .08) * reveal;
+          ctx.globalAlpha = Math.min(1, particle.alpha * shimmer * Math.min(1, elapsed * 1.6 + .08) * reveal * 1.32);
           ctx.fillStyle = particle.color;
           ctx.beginPath();
-          ctx.arc(particle.x, particle.y, Math.max(.6, target.size / 510 * particle.radius), 0, Math.PI * 2);
+          ctx.arc(particle.x, particle.y, Math.max(.6, renderedRadius(target.size, particle)), 0, Math.PI * 2);
           ctx.fill();
         });
 
@@ -250,6 +253,10 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
             const target = position({ u, v });
             const angle = Math.random() * Math.PI * 2;
             const scatter = 70 + Math.random() * Math.max(width, height) * .7;
+            const darkLift = Math.max(0, 155 - brightness) * .38;
+            const particleR = Math.min(255, r * 1.12 + 20 + darkLift * .6);
+            const particleG = Math.min(255, g * 1.14 + 24 + darkLift * .82);
+            const particleB = Math.min(255, b * 1.18 + 30 + darkLift);
             particles.push({
               u,
               v,
@@ -260,8 +267,8 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
               vx: 0,
               vy: 0,
               radius: brightness < 110 ? 1.42 : 1.08,
-              alpha: Math.min(1, .58 + (255 - brightness) / 245),
-              color: `rgb(${r},${g},${b})`,
+              alpha: Math.min(1, .78 + (255 - brightness) / 210),
+              color: `rgb(${particleR},${particleG},${particleB})`,
               phase: Math.random() * Math.PI * 2,
             });
           }
@@ -312,21 +319,21 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
     content: "";
     position: absolute;
     top: 4%;
-    right: -7%;
+    right: -16%;
     bottom: -10%;
-    left: 42%;
+    left: 8%;
     z-index: 1;
     border-radius: 50%;
     background: radial-gradient(circle, transparent 0 32%, rgba(106,168,255,.07) 32.2% 32.5%, transparent 32.8% 46%, rgba(90,216,204,.05) 46.2% 46.5%, transparent 46.8%);
     animation: particle-orbit 9s ease-in-out infinite alternate;
   }
-  canvas { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; opacity: .96; mask-image: linear-gradient(90deg, transparent 14%, rgba(0,0,0,.35) 42%, black 66%); }
+  canvas { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; opacity: 1; filter: saturate(1.28) brightness(1.2) drop-shadow(0 0 3px rgba(91, 160, 246, .2)); mask-image: linear-gradient(90deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.54) 24%, rgba(0,0,0,.97) 52%, black 72%); }
   .particle-logo-fallback {
     position: absolute;
-    top: 52%;
-    left: 74%;
+    top: 55%;
+    left: 62%;
     z-index: 2;
-    width: min(58%, 720px);
+    width: min(120%, 2040px);
     height: auto;
     border-radius: 22px;
     opacity: .025;
@@ -341,17 +348,17 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
     inset: 0;
     z-index: 4;
     pointer-events: none;
-    opacity: .1;
+    opacity: .085;
     background-image: radial-gradient(rgba(191, 222, 255, .75) .45px, transparent .6px);
     background-size: 5px 5px;
     mask-image: radial-gradient(circle at 50% 48%, black, transparent 75%);
   }
   .particle-wordmark {
     position: absolute;
-    top: 76%;
-    left: 74%;
+    top: 78%;
+    left: 62%;
     z-index: 5;
-    width: min(43vw, 590px);
+    width: min(64vw, 900px);
     color: #f2f7ff;
     text-align: center;
     text-shadow: 0 0 32px rgba(75, 146, 244, .22);
@@ -381,7 +388,7 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
   .wordmark-layer strong {
     display: block;
     font-family: "Avenir Next", Avenir, Montserrat, var(--sans);
-    font-size: clamp(3rem, 5.4vw, 5.75rem);
+    font-size: clamp(3rem, 7.4vw, 8rem);
     font-weight: 520;
     line-height: .86;
     letter-spacing: -.075em;
@@ -394,10 +401,10 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
     -webkit-text-fill-color: transparent;
   }
   .wordmark-layer small {
-    margin-top: 18px;
+    margin-top: clamp(14px, 1.5vw, 22px);
     margin-left: .42em;
     color: rgba(218, 234, 253, .78);
-    font-size: clamp(.55rem, .72vw, .78rem);
+    font-size: clamp(.56rem, .95vw, 1rem);
     font-weight: 760;
     letter-spacing: .42em;
   }
@@ -406,8 +413,8 @@ const logoUrl = `${import.meta.env.BASE_URL}geobrain-logo.jpg`;
     .particle-logo::before { mask-image: linear-gradient(180deg, transparent 5%, black 50%, black 100%); }
     .particle-logo::after { top: 38%; right: -20%; bottom: -14%; left: -20%; }
     canvas { opacity: .62; mask-image: linear-gradient(180deg, transparent 20%, rgba(0,0,0,.4) 47%, black 70%); }
-    .particle-logo-fallback { top: 67%; left: 54%; width: min(94%, 520px); opacity: .04; }
-    .particle-wordmark { top: 79%; left: 54%; width: min(88vw, 520px); }
+    .particle-logo-fallback { top: 67%; left: 55%; width: min(106%, 560px); opacity: .035; }
+    .particle-wordmark { top: 80%; left: 55%; width: min(92vw, 560px); }
     .wordmark-layer strong { font-size: clamp(2.55rem, 14vw, 4.6rem); }
     .wordmark-layer small { margin-top: 13px; font-size: .52rem; letter-spacing: .3em; }
   }
