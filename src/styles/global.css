@@ -418,8 +418,12 @@ button, a, summary, select { -webkit-tap-highlight-color: transparent; }
 .guide-access-form { padding: 24px; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; background: rgba(255,255,255,.05); }
 .guide-access-form label { display: block; margin-bottom: 9px; color: rgba(255,255,255,.72); font-size: .7rem; font-weight: 760; letter-spacing: .07em; }
 .guide-access-form > div { display: grid; grid-template-columns: 1fr auto; gap: 9px; }
-.guide-access-form input { min-width: 0; min-height: 48px; padding: 10px 14px; color: var(--ink); background: white; border: 2px solid transparent; border-radius: 11px; font-size: 1rem; }
+.guide-password-control { position: relative; min-width: 0; }
+.guide-access-form input { width: 100%; min-width: 0; min-height: 48px; padding: 10px 72px 10px 14px; color: var(--ink); background: white; border: 2px solid transparent; border-radius: 11px; font-size: 1rem; }
 .guide-access-form input:focus { border-color: var(--orange); outline: 0; }
+.guide-access-form .password-visibility-toggle { position: absolute; top: 50%; right: 7px; min-width: 52px; padding: 7px 9px; color: #47566a; background: #edf2f6; border: 0; border-radius: 8px; font: inherit; font-size: .7rem; font-weight: 760; cursor: pointer; transform: translateY(-50%); }
+.guide-access-form .password-visibility-toggle:hover { color: var(--ink); background: #e0e8ef; }
+.guide-access-form .password-visibility-toggle:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 .guide-access-form button:disabled { cursor: wait; opacity: .62; }
 .guide-access-status { min-height: 20px; margin: 12px 0 0; color: rgba(255,255,255,.62); font-size: .7rem; }
 .guide-access-status[data-state="error"] { color: #ffb19b; }

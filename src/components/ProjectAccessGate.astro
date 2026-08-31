@@ -19,7 +19,17 @@ const passwordDigest = 'f3497f4a275e86f00f60dfee673792e9f52ab7090b6aeedcde117948
       <form class="project-lock-form" data-project-form>
         <label for={`project-password-${lang}`}>{lang === 'zh' ? '访问密码' : 'Access password'}</label>
         <div>
-          <input id={`project-password-${lang}`} name="password" type="password" autocomplete="current-password" required />
+          <div class="project-password-control">
+            <input id={`project-password-${lang}`} name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required />
+            <button
+              class="password-visibility-toggle"
+              type="button"
+              data-password-toggle
+              aria-controls={`project-password-${lang}`}
+              aria-pressed="false"
+              aria-label={lang === 'zh' ? '显示密码' : 'Show password'}
+            ><span data-password-toggle-label>{lang === 'zh' ? '显示' : 'Show'}</span></button>
+          </div>
           <button class="button button-primary" type="submit">{lang === 'zh' ? '查看项目' : 'View projects'}<span>→</span></button>
         </div>
         <p class="project-lock-status" data-project-status aria-live="polite"></p>
@@ -39,6 +49,8 @@ const passwordDigest = 'f3497f4a275e86f00f60dfee673792e9f52ab7090b6aeedcde117948
     document.querySelectorAll('[data-project-access]').forEach((shell) => {
       const form = shell.querySelector('[data-project-form]');
       const input = form?.querySelector('input[name="password"]');
+      const passwordToggle = form?.querySelector('[data-password-toggle]');
+      const passwordToggleLabel = passwordToggle?.querySelector('[data-password-toggle-label]');
       const status = shell.querySelector('[data-project-status]');
       const lock = shell.querySelector('[data-project-lock]');
       const content = shell.querySelector('[data-project-content]');
@@ -56,6 +68,19 @@ const passwordDigest = 'f3497f4a275e86f00f60dfee673792e9f52ab7090b6aeedcde117948
       try {
         if (sessionStorage.getItem(sessionKey) === shell.dataset.passwordDigest) unlock();
       } catch {}
+
+      passwordToggle?.addEventListener('click', () => {
+        const isVisible = input.type === 'password';
+        input.type = isVisible ? 'text' : 'password';
+        passwordToggle.setAttribute('aria-pressed', String(isVisible));
+        passwordToggle.setAttribute('aria-label', isVisible
+          ? (isZh ? '隐藏密码' : 'Hide password')
+          : (isZh ? '显示密码' : 'Show password'));
+        if (passwordToggleLabel) passwordToggleLabel.textContent = isVisible
+          ? (isZh ? '隐藏' : 'Hide')
+          : (isZh ? '显示' : 'Show');
+        input.focus({ preventScroll: true });
+      });
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -134,10 +159,15 @@ const passwordDigest = 'f3497f4a275e86f00f60dfee673792e9f52ab7090b6aeedcde117948
     grid-template-columns: 1fr auto;
     gap: 10px;
   }
+  .project-password-control {
+    position: relative;
+    min-width: 0;
+  }
   .project-lock-form input {
+    width: 100%;
     min-width: 0;
     min-height: 50px;
-    padding: 11px 15px;
+    padding: 11px 72px 11px 15px;
     color: var(--ink);
     background: #f7fbff;
     border: 2px solid transparent;
@@ -145,6 +175,24 @@ const passwordDigest = 'f3497f4a275e86f00f60dfee673792e9f52ab7090b6aeedcde117948
     font-size: 1rem;
   }
   .project-lock-form input:focus { border-color: #75adfb; outline: 0; }
+  .password-visibility-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    min-width: 52px;
+    padding: 7px 9px;
+    color: #37516d;
+    background: rgba(226, 237, 248, .78);
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-size: .7rem;
+    font-weight: 760;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .password-visibility-toggle:hover { color: #0c2c50; background: #dceafb; }
+  .password-visibility-toggle:focus-visible { outline: 2px solid #75adfb; outline-offset: 2px; }
   .project-lock-form .button { white-space: nowrap; }
   .project-lock-status {
     min-height: 20px;

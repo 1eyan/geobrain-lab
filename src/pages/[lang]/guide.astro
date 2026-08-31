@@ -46,7 +46,17 @@ const encryptedUrl = `${import.meta.env.BASE_URL}${siteMeta.guideEncryptedFile}`
         <form class="guide-access-form" data-guide-access>
           <label for={`guide-password-${lang}`}>{lang === 'zh' ? '访问密码' : 'Access password'}</label>
           <div>
-            <input id={`guide-password-${lang}`} name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required />
+            <div class="guide-password-control">
+              <input id={`guide-password-${lang}`} name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required />
+              <button
+                class="password-visibility-toggle"
+                type="button"
+                data-password-toggle
+                aria-controls={`guide-password-${lang}`}
+                aria-pressed="false"
+                aria-label={lang === 'zh' ? '显示密码' : 'Show password'}
+              ><span data-password-toggle-label>{lang === 'zh' ? '显示' : 'Show'}</span></button>
+            </div>
             <button class="button button-primary" type="submit">{lang === 'zh' ? '解锁指南' : 'Unlock guide'}</button>
           </div>
           <p class="guide-access-status" data-guide-status aria-live="polite"></p>
@@ -78,6 +88,8 @@ const encryptedUrl = `${import.meta.env.BASE_URL}${siteMeta.guideEncryptedFile}`
   const shell = document.querySelector<HTMLElement>('[data-guide-shell]');
   const form = shell?.querySelector<HTMLFormElement>('[data-guide-access]');
   const passwordInput = form?.querySelector<HTMLInputElement>('input[name="password"]');
+  const passwordToggle = form?.querySelector<HTMLButtonElement>('[data-password-toggle]');
+  const passwordToggleLabel = passwordToggle?.querySelector<HTMLElement>('[data-password-toggle-label]');
   const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
   const status = form?.querySelector<HTMLElement>('[data-guide-status]');
   const content = document.querySelector<HTMLElement>('[data-guide-content]');
@@ -91,6 +103,21 @@ const encryptedUrl = `${import.meta.env.BASE_URL}${siteMeta.guideEncryptedFile}`
     status.textContent = message;
     status.dataset.state = state;
   };
+
+  passwordToggle?.addEventListener('click', () => {
+    if (!passwordInput || !shell) return;
+    const isZh = shell.dataset.lang === 'zh';
+    const isVisible = passwordInput.type === 'password';
+    passwordInput.type = isVisible ? 'text' : 'password';
+    passwordToggle.setAttribute('aria-pressed', String(isVisible));
+    passwordToggle.setAttribute('aria-label', isVisible
+      ? (isZh ? '隐藏密码' : 'Hide password')
+      : (isZh ? '显示密码' : 'Show password'));
+    if (passwordToggleLabel) passwordToggleLabel.textContent = isVisible
+      ? (isZh ? '隐藏' : 'Hide')
+      : (isZh ? '显示' : 'Show');
+    passwordInput.focus({ preventScroll: true });
+  });
 
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
