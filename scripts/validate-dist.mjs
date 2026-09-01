@@ -32,8 +32,11 @@ for (const file of htmlFiles) {
   if (/target="_blank"(?![^>]*rel="noopener noreferrer")/.test(html)) {
     throw new Error(`Unsafe external link in ${file}`);
   }
-  if (/href="\/(zh|en)\//.test(html)) {
-    throw new Error(`GitHub Pages base path missing in ${file}`);
+  if (/(?:href|src)="\/geobrain-lab(?:\/|")/.test(html)) {
+    throw new Error(`Legacy GitHub Pages base path found in ${file}`);
+  }
+  if (!html.includes('https://hitgeo.top/')) {
+    throw new Error(`Custom domain metadata missing in ${file}`);
   }
 }
 

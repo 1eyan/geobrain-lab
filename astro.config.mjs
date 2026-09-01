@@ -2,8 +2,8 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://1eyan.github.io',
-  base: process.env.BASE_PATH ?? '/geobrain-lab',
+  site: process.env.SITE_URL ?? 'https://hitgeo.top',
+  base: process.env.BASE_PATH ?? '/',
   output: 'static',
   trailingSlash: 'always',
   compressHTML: true,
